@@ -20,6 +20,7 @@ var firstNumber = 0;
 var secondNumber = 0;
 var operator = null;
 var haveOperator = false;
+var displayedResult = false;
 
 function getFirstNumber(){
   return firstNumber;
@@ -45,23 +46,42 @@ function getHaveOperator(){
 function setHaveOperator(haveOpr){
   haveOperator = haveOpr;
 }
+function getDisplayedResult(){
+  return displayedResult;
+}
+function setDisplayedResult(value){
+  displayedResult = value;
+}
 
 function operate(operator, firstNum, secondNum) {
   if (operator == "+"){
-    add(firstNum,secondNum);
+    return add(firstNum,secondNum);
   }
   else if (operator == "-"){
-    subtract(firstNum,secondNum);
+    return subtract(firstNum,secondNum);
   }
   else if (operator == "*"){
-    multiply(firstNum,secondNum);
+    return multiply(firstNum,secondNum);
   }
   else if (operator == "/"){
-    divide(firstNum,secondNum);
+    return divide(firstNum,secondNum);
   }
 }
 
+function ChangeScreenAppend(value){
+  if(getDisplayedResult()){
+    clearScreen();
+    setDisplayedResult(false);
+  }
+  document.getElementById('screen-container').insertAdjacentText('beforeend', value);
+}
 
+function clearScreen(){
+  document.getElementById('screen-container').textContent = ''; 
+}
+function displayErrorMessage(){
+  document.getElementById('screen-container').textContent = 'Error'; 
+}
 
 const buttons = document.querySelectorAll("button");
 
@@ -77,42 +97,54 @@ buttons.forEach((button)=>{
       setHaveOperator(false);
     }
     if (button.className == "operators"){
-      // operate()
       setHaveOperator(true);
-      console.log(button.value);
-      // operator = button.value;
       setOperator(button.value);
-      // document.getElementById('screen-container').innerHTML = ""
+      clearScreen();
+    
     }
     if (button.className == "numbers"){
-    
-      if(!haveOperator){
-        document.getElementById('screen-container').innerHTML += button.value;
-        currentNumber = parseInt(document.getElementById('screen-container').innerHTML);
-        // firstNumber = currentNumber;
+      
+
+      if(!getHaveOperator()){
+        ChangeScreenAppend(button.value);  
+        currentNumber = parseFloat(document.getElementById('screen-container').innerHTML);
+        
         setFirstNumber(currentNumber);
       }
       else{
-        document.getElementById('screen-container').innerHTML = ""
-        document.getElementById('screen-container').innerHTML += button.value;
-        currentNumber = parseInt(document.getElementById('screen-container').innerHTML);
-        // secondNumber = currentNumber;
+        // clearScreen();
+
+        // changeScreenAll(getFirstNumber());
+        ChangeScreenAppend(button.value);
+        currentNumber = parseFloat(document.getElementById('screen-container').innerHTML);
         setSecondNumber(currentNumber);
-        
-        
       }
       
     }
     if (button.value == "="){
       // operate(operator, );
-      setHaveOperator(false);
-      console.log(getFirstNumber());
-      console.log(getSecondNumber());
-      console.log(getOperator());
-      document.getElementById('screen-container').innerHTML = ""
+      if(!(getOperator() == null)){
+        const result = operate(getOperator(), getFirstNumber(), getSecondNumber());
+        setHaveOperator(false);
+        console.log("variables---");
+        console.log(getFirstNumber());
+        console.log(getSecondNumber());
+        console.log(getOperator());
+        console.log(result);
+        document.getElementById('screen-container').innerHTML = result;
+        setDisplayedResult(true);
+        setHaveOperator(false);
+        setOperator(null);
+        setFirstNumber(result);
+        setSecondNumber(0);
+      }
+      // else{
+      //   displayErrorMessage();
+      // }
+
     }
-
-
-    // document.getElementById('screen-container').innerHTML += button.value;
+    if (button.value == "."){
+      ChangeScreenAppend(".");
+    }
   })
 });
